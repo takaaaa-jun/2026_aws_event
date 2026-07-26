@@ -9,7 +9,7 @@ class Clinic(Base):
     __tablename__ = "clinic"
 
     clinic_id = Column(Integer, primary_key=True, autoincrement=True)
-    clinic_name = Column(Integer, nullable=True)
+    clinic_name = Column(String(255), nullable=True)
     clinic_postcode = Column(Text, nullable=True)
     clinic_address = Column(Text, nullable=True)
     clinic_tel = Column(Text, nullable=True)

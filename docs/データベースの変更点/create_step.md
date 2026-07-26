@@ -27,7 +27,6 @@ Docker Compose を使用して、ローカルPC上にデータベース（MySQL�
 docker compose up -d
 ```
 
-
 ## 4. テーブルの作成・初期化
 モデル定義に基づいて、データベース内に自動でテーブルを作成する初期化スクリプトを実行します。
 ※実行する前に `.env` の `MYSQL_HOST` が `localhost` になっていることを確認してください。
@@ -36,9 +35,27 @@ docker compose up -d
 python scripts/init_db.py
 ```
 
-## 5. 作成されたテーブルの確認方法
-Docker Compose を通じてコンテナ内のMySQLクライアントを呼び出し、テーブルが正常に作成されているかを確認できます。
+## 5. データのインポート
+CSVファイル（一般・歯科クリニックのジオコーディングデータ）をデータベースにインポートします。
 
 ```bash
+python scripts/import_data.py
+```
+
+## 6. 作成されたデータ・テーブルの確認方法
+Docker Compose を通じてコンテナ内のMySQLクライアントを呼び出し、データが正常に登録されているかを確認できます。
+
+### テーブル一覧の確認
+```bash
 docker compose exec db mysql -u root -ppass -e "SHOW TABLES FROM clinic;"
+```
+
+### 登録されたデータの確認（件数確認）
+```bash
+docker compose exec db mysql -u root -ppass -D clinic -e "SELECT COUNT(*) FROM clinic;"
+```
+
+### インタラクティブモードでのログイン
+```bash
+docker compose exec db mysql -u root -p
 ```
