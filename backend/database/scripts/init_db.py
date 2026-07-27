@@ -13,9 +13,11 @@ def init_tables():
     # 接続情報（engine）のみを connection_database から取得します
     engine, _, _ = connection_database()
     
+    # 既存のテーブルをすべて削除して初期化します
+    Base.metadata.drop_all(bind=engine)
     # models から読み込んだ Base を使ってテーブルを作成します
     Base.metadata.create_all(bind=engine)
-    print("すべてのテーブルの作成が完了しました。")
+    print("すべてのテーブルの作成・初期化が完了しました。")
 
 if __name__ == "__main__":
     init_tables()

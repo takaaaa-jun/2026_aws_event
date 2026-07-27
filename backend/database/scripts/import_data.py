@@ -36,6 +36,14 @@ def get_float_value(val):
 def import_csv_data():
     _, session, _ = connection_database()
 
+    # 重複挿入を防ぐため、既存のデータを削除して初期化します
+    print("既存のデータをクリアしています...")
+    session.query(ClinicDepartment).delete()
+    session.query(LatitudeLongitude).delete()
+    session.query(Clinic).delete()
+    session.query(Department).delete()
+    session.commit()
+
     general_dept_names = [
         "内科",
         "呼吸器内科",
