@@ -20,13 +20,16 @@ import os
 def connection_database():
     env_data = create_env_data()
 
-    # ローカル（Windows）から実行する場合、コンテナ名(dbやmysql)をlocalhostに自動で置き換えます
-    # ただし、コンテナ内で実行されている場合は置き換えを行いません
-    db_host = env_data["MYSQL_HOST"]
+    db_host = env_data.get("MYSQL_HOST", "db")
     if not os.path.exists('/.dockerenv') and db_host in ("db", "mysql"):
         db_host = "localhost"
 
-    DATABASE = f"mysql+pymysql://{env_data['MYSQL_USER']}:{env_data['MYSQL_PASSWORD']}@{db_host}:{env_data['MYSQL_PORT']}/{env_data['MYSQL_DATABASE']}?charset=utf8mb4"
+    db_user = env_data.get("MYSQL_USER", "root")
+    db_password = env_data.get("MYSQL_PASSWORD", "pass")
+    db_port = env_data.get("MYSQL_PORT", "3306")
+    db_database = env_data.get("MYSQL_DATABASE", "clinic")
+
+    DATABASE = f"mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_database}?charset=utf8mb4"
 
     engine = create_engine(DATABASE, echo=False)
 

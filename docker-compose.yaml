@@ -26,10 +26,6 @@ services:
     volumes:
       # ローカルのbackendディレクトリをコンテナ内にマウント
       - ./backend:/app
-      # データベースの初期化スクリプト群を同期
-      - ./database:/app/database
-      # インポートするCSVデータ群を同期
-      - ./data:/app/data
       # データベース接続に必要な設定を共有するため，ルートの .env ファイルをマウント
       - .env:/app/.env
     environment:
