@@ -1,79 +1,51 @@
-# AWS Event Clinic プロジェクト
+# Project(AWS地域創生・社会課題解決AIコンテスト)
+- AWS地域創生・社会課題解決AIコンテストの作品として作成したWebアプリ
 
-Docker Compose を利用した開発環境の実行および確認手順です。
+## アプリ概要
 
-## 各コンテナへのアクセス方法
+### 作成目的
+- このWebアプリを使用することで，新潟県の無医地区の場所を特定し，マップ上で可視化することで無医地区の現状を早急に理解し，無医地区を減少させるための政策を考えることに役立つアプリです．
 
-| サービス | コンテナ内ポート | ホストPCからのアクセスURL / 接続先 |
-| :--- | :--- | :--- |
-| **フロントエンド** (Vite + React + TS) | `5173` | [http://localhost:5173](http://localhost:5173) |
-| **バックエンド** (FastAPI) | `8000` | [http://localhost:8000](http://localhost:8000) (API仕様書: [http://localhost:8000/docs](http://localhost:8000/docs)) |
-| **データベース** (MySQL) | `3306` | ホスト: `localhost` / ポート: `3306`（`.env` の `MYSQL_PORT` に従う） |
+### 背景・課題
+- 第8次新潟県地域保健医療計画[1]では，「**全ての地域で必要な医療が十分に提供され、健康で安心して暮らせる新潟県づくり**」を基本理念としている．
+- 基本理念の達成のために，以下の二つを基本的な考え方としている．
+  - 「地域の中で質の高い医療を受けることのできる体制づくり」
+  - 「医療従事者にとっても魅力的に感じられる医療再編の実現」
+- 新潟県の無医地区の数は，全国で4番目に多く，医療が届けられていないことが問題となっている．
 
----
+### 解決手法
+- 無医地区の範囲を地理情報から特定し，マップ上で可視化することで，現状ではどの地域に無医地区が存在しているのかを特定する．
+- 特定された無医地区に対して，医療政策を実施することで，医療計画の基本理念に大きく近づくことができると考える．
 
-## 各コンテナのバージョン確認コマンド
+## 構築したWebアプリ
+- アプリの概要から，構築したWebアプリの説明を記載する．
 
-コンテナが起動している状態で、ホストPC（Windows）のターミナルから以下のコマンドを実行することで、各環境のバージョンを確認できます。
+### 機能
+- 新潟県内の診療所の場所を表示（各診療所に含まれている科も）
+- 定義した無医地区の地点から，無医地区の算出方法に従い，範囲を特定
 
-### 1. データベース (MySQL) のバージョン確認
-```bash
-docker compose exec db mysql --version
+## 技術スタック
+- client side
+  - Typescript
+  - React
 
-# コンテナ内に入るとき
-docker compose exec db bash
-mysql -u root -p
-# pass
-```
+- server side
+  - Python
+  - FastAPI
+  
+- database
+  - MySQL8.0
 
-### 2. バックエンド (Python) のバージョン確認
-```bash
-docker compose exec backend python --version
+- CI/CD
+  - Docker
+  - Docker Compose
+  - GitHub
 
-# コンテナ内に入るとき
-docker compose exec backend bash
-```
+## 仕様書
+- [仕様書](docs/仕様書.md)はこちらに記載．
 
-### 3. フロントエンド (Node.js) のバージョン確認
-```bash
-docker compose exec frontend node --version
+## Dockerによる環境構築
+- [Dockerによる環境構築](docs/Dockerの環境構築.md)はこちらに記載．
 
-# コンテナ内に入るとき
-docker compose exec frontend bash
-```
-
----
-
-## Docker Compose 起動・操作用基本コマンド
-
-開発時に使用する Docker Compose の基本操作コマンドです。プロジェクトのルートディレクトリで実行します。
-
-### 1. 起動（バックグラウンド実行）
-初回起動や、通常起動の際に使用します。
-```bash
-docker compose up -d
-```
-
-### 2. 再ビルドを伴う起動
-`requirements.txt` や `package.json` を変更した際や、Dockerfileを変更した後に使用します。
-```bash
-docker compose up --build -d
-```
-
-### 3. 停止
-起動しているすべてのコンテナを停止・削除します（ボリューム内のデータベースデータは保護されます）。
-```bash
-docker compose down
-```
-
-### 4. ログの確認
-コンテナ内のログをリアルタイムで監視したい場合に使用します。
-```bash
-docker compose logs -f
-```
-
-### 5. コンテナの稼働ステータス確認
-```bash
-docker compose ps
-```
-
+## reference
+- [1] https://www.pref.niigata.lg.jp/sec/chiikiiryo/1356890019056.html
