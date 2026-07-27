@@ -2,40 +2,31 @@
 - コンテナを作成して，ローカル差分をなくすことで，環境の構築を素早く行うことができる．
 
 ## 作成するコンテナ
-- 作成するコンテナのサービス名
 
-### コンテナ名
-- db
-### 使用するイメージ
-- mysql:8.0
-### ポート番号
-- 3306
-### 永続化する場所
-- ./dbdata
+### dbコンテナ
+- イメージ: mysql:8.0
+- ポート番号: 3306
+- データベースの保存先: /var/lib/mysql
+  - "mysql_data"と名前を付けて，永続化（再起動してもデータが残る）
 
-### コンテナ名
-- backend
-### 使用するイメージ
-- python:3.12
-### ポート番号
-- 8000
-### 永続化する場所
-- ./backend_data
+### backendコンテナ
+- イメージ: python:3.14.6-slim
+- ポート番号: 8000
 
-### コンテナ名
-- backend
-### 使用するイメージ
-- python:3.12
-### ポート番号
-- 8000
-### 永続化する場所
-- ./backend_data
+### frontendコンテナ
+- イメージ: node:20-alpine
+- ポート番号: 5173
 
-### コンテナ名
-- backend
-### 使用するイメージ
-- python:3.12
-### ポート番号
-- 8000
-### 永続化する場所
-- ./backend_data
+## docker-compose.yamlとDockerfileの違い
+- docker-compose.yaml: 複数コンテナの連携
+- Dockerfile: 1コンテナ分の設定
+
+## 初回セットアップ手順
+
+```bash
+# backendコンテナにアクセスして，データベースの読み込みを行う
+# データベースのテーブル作成
+docker compose exec backend python database/scripts/init_db.py
+# ジオコーディングデータ等のCSVデータインポート
+docker compose exec backend python database/scripts/import_data.py
+```

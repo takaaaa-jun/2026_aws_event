@@ -15,12 +15,15 @@ def create_env_data() -> dict:
     return env_data
 
 
+import os
+
 def connection_database():
     env_data = create_env_data()
 
     # ローカル（Windows）から実行する場合、コンテナ名(dbやmysql)をlocalhostに自動で置き換えます
+    # ただし、コンテナ内で実行されている場合は置き換えを行いません
     db_host = env_data["MYSQL_HOST"]
-    if db_host in ("db", "mysql"):
+    if not os.path.exists('/.dockerenv') and db_host in ("db", "mysql"):
         db_host = "localhost"
 
     DATABASE = f"mysql+pymysql://{env_data['MYSQL_USER']}:{env_data['MYSQL_PASSWORD']}@{db_host}:{env_data['MYSQL_PORT']}/{env_data['MYSQL_DATABASE']}?charset=utf8mb4"
