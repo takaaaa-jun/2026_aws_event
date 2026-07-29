@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.clinics import router as clinics_router
+
 app = FastAPI(title="AWS Event Clinic API")
 
 # Configure CORS for Next.js frontend
@@ -19,3 +21,6 @@ def read_root():
 @app.get("/health")
 def health_check():
     return {"status": "healthy"}
+
+
+app.include_router(clinics_router)
