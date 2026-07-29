@@ -10,6 +10,7 @@ from connection_database import connection_database
 from models import Clinic, LatitudeLongitude, Department, ClinicDepartment
 from path_info import get_geocoding_path
 from log_decorator import Logger
+from session import session
 
 CLINICS_CSV = get_geocoding_path() / "R8_Niigata_Clinics_All.csv"
 DENTAL_CSV = get_geocoding_path() / "R8_Niigata_DentalClinics_All.csv"
@@ -34,7 +35,7 @@ def get_float_value(val):
 
 
 def import_csv_data():
-    _, session, _ = connection_database()
+    
 
     # 重複挿入を防ぐため、既存のデータを削除して初期化します
     print("既存のデータをクリアしています...")
