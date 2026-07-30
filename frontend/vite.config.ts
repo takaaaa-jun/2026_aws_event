@@ -4,4 +4,9 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  server: {
+    port: 5174,
+    strictPort: true, // 5174が使用中の場合はエラーにする
+    host: true,       // コンテナ外（Windows側）からアクセス可能にする
+  },
 })
