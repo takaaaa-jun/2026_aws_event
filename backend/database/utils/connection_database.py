@@ -1,8 +1,13 @@
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 
-from path_info import get_env_path
+try:
+    from .path_info import get_env_path
+except ImportError:
+    from path_info import get_env_path
 
 
 def create_env_data() -> dict:
@@ -14,8 +19,6 @@ def create_env_data() -> dict:
                 env_data[key] = value
     return env_data
 
-
-import os
 
 def connection_database():
     env_data = create_env_data()

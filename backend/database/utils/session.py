@@ -1,8 +1,13 @@
-from connection_database import create_env_data
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
-import os
+
+try:
+    from .connection_database import create_env_data
+except ImportError:
+    from connection_database import create_env_data
 
 env_data = create_env_data()
 

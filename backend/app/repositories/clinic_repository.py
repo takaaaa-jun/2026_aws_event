@@ -1,7 +1,7 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
-from app.models.clinic import Clinic, ClinicDepartment, Department
+from database.utils.models import Clinic, ClinicDepartment, Department
 
 
 class ClinicRepository:
