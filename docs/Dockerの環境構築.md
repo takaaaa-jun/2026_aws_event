@@ -89,6 +89,18 @@ docker compose logs -f
 
 # ステータスの確認
 docker compose ps
+
+# docker コンテナを落とす
+docker compose down
+
+# ビルドキャッシュ削除
+docker builder prune --all
+
+# 念のため --no-cache オプションを付けてビルド
+docker compose build --no-cache
+
+# コンテナを再起動
+docker compose up -d
 ```
 
 ### 2. 各コンテナのバージョン確認コマンド
@@ -120,7 +132,7 @@ mysql -u root -p # パスワードの入力
 docker compose exec backend bash
 
 # frontendコンテナ
-docker compose exec frontend bash
+docker compose exec frontend sh
 ```
 
 ### 3. データベースのテーブル作成
