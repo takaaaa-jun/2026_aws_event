@@ -1,8 +1,13 @@
+import os
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.ext.declarative import declarative_base
 
-from path_info import get_env_path
+try:
+    from .path_info import get_env_path
+except ImportError:
+    from path_info import get_env_path
 
 
 def create_env_data() -> dict:
@@ -15,8 +20,6 @@ def create_env_data() -> dict:
     return env_data
 
 
-import os
-
 def connection_database():
     env_data = create_env_data()
 
@@ -27,6 +30,9 @@ def connection_database():
     db_user = env_data.get("MYSQL_USER", "root")
     db_password = env_data.get("MYSQL_PASSWORD", "pass")
     db_port = env_data.get("MYSQL_PORT", "3306")
+    if os.path.exists('/.dockerenv'):
+        db_host = "db"
+        db_port = "3306"
     db_database = env_data.get("MYSQL_DATABASE", "clinic")
 
     DATABASE = f"mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_database}?charset=utf8mb4"

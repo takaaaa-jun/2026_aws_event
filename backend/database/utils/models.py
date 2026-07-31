@@ -1,6 +1,10 @@
 from sqlalchemy import Column, Integer, String, Text, Float, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
-from connection_database import connection_database
+
+try:
+    from .connection_database import connection_database
+except ImportError:
+    from connection_database import connection_database
 
 _, _, Base = connection_database()
 

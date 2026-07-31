@@ -2,15 +2,17 @@ import { useState, useMemo } from 'react'
 import Header from './components/Header'
 import FilterPanel from './components/FilterPanel'
 import MapArea from './components/MapArea'
-import type { Clinic } from './types/clinic'
+import useClinicData from './hooks/useClinicData'
 import './App.css'
 
 function App() {
   const [selectedDepartments, setSelectedDepartments] = useState<number[]>([])
-  // clinics は MapArea 担当の方が API から取得する想定
-  // 現時点では空配列、API 実装後に useClinics フックなどで差し替える
-  const [clinics] = useState<Clinic[]>([])
 
+  // APIを1回だけ呼んで departments と clinics を取得
+  // → FilterPanel と MapArea に配布する
+  const { departments, clinics, loading, error } = useClinicData()
+
+  // 選択中の診療科で診療所を絞り込み → MapArea（Googleマップ担当）に渡す
   const filteredClinics = useMemo(() => {
     if (selectedDepartments.length === 0) {
       return clinics
@@ -24,10 +26,14 @@ function App() {
     <div className="app">
       <Header />
       <div className="app-body">
-        {/* Google Maps 担当の方には「絞り込み済みの配列」だけを渡す */}
+        {/* Googleマップ担当の方はここで filteredClinics を使う */}
         <MapArea clinics={filteredClinics} />
 
+        {/* フィルターパネル: departments は App から受け取る（API二重呼び出しなし） */}
         <FilterPanel
+          departments={departments}
+          loading={loading}
+          error={error}
           selected={selectedDepartments}
           onChange={setSelectedDepartments}
         />

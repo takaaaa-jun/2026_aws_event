@@ -29,7 +29,7 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_PORT: ${MYSQL_PORT}
+      MYSQL_PORT: 3306
     depends_on:
       - db
 
@@ -39,7 +39,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "5173:5173"
+      - "127.0.0.1:5174:5174"
     volumes:
       # フロントエンドのコード変更を即時反映
       - ./frontend:/app
@@ -47,6 +47,7 @@ services:
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true # Windows等でホットリロードが正しく動くようにする設定
+      - VITE_GOOGLE_MAPS_API_KEY=${VITE_GOOGLE_MAPS_API_KEY}
     depends_on:
       - backend
     stdin_open: true # Viteのインタラクティブシェル等を維持するための設定

@@ -1,10 +1,14 @@
 import type { ApiResponse, Department } from '../types/clinic'
 import { DEPARTMENTS } from '../constants/departments'
 
-const API_BASE_URL = 'http://localhost:8000'
+const API_BASE_URL = ''
 
-// バックエンドAPIが未完成の場合は true にしてモックを使う
-const MOCK_MODE = true
+//デザインの確認のため
+const MOCK_MODE = false
+
+// 正しいエンドポイント: /api/v1/clinics?limit=<件数>
+// limit は必須パラメータ。今回は2000を指定
+const CLINICS_ENDPOINT = `${API_BASE_URL}/api/v1/clinics?limit=2000`
 
 // 診療科一覧を取得する（APIレスポンスの departments フィールドを返す）
 export async function fetchDepartments(): Promise<Department[]> {
@@ -13,7 +17,7 @@ export async function fetchDepartments(): Promise<Department[]> {
     return Promise.resolve(DEPARTMENTS)
   }
 
-  const response = await fetch(`${API_BASE_URL}/api/v1/departments`)
+  const response = await fetch(CLINICS_ENDPOINT)
   if (!response.ok) {
     throw new Error(`診療科一覧の取得に失敗しました: ${response.status}`)
   }
@@ -28,7 +32,7 @@ export async function fetchClinics() {
     return Promise.resolve([])
   }
 
-  const response = await fetch(`${API_BASE_URL}/api/v1/departments`)
+  const response = await fetch(CLINICS_ENDPOINT)
   if (!response.ok) {
     throw new Error(`診療所一覧の取得に失敗しました: ${response.status}`)
   }

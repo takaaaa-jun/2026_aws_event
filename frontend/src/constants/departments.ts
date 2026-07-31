@@ -1,7 +1,5 @@
 import type { Department } from '../types/clinic'
 
-// APIが完成したらこの定数は不要になりますが、
-// バックエンドとの照合用に残しておくことを推奨します。
 export const DEPARTMENTS: Department[] = [
   { department_id: 1,  department_name: '婦人科' },
   { department_id: 2,  department_name: '外科' },
