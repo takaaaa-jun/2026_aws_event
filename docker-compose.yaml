@@ -19,11 +19,13 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    # コンテナ内での起動時のカレントディレクトリを /app/backend に指定
+    working_dir: /app/backend
     volumes:
-      # ローカルのbackendディレクトリをコンテナ内にマウント
-      - ./backend:/app
-      # データベース接続に必要な設定を共有するため，ルートの .env ファイルをマウント
-      - .env:/app/.env
+      # プロジェクトルートディレクトリをマウント
+      - .:/app
+      # ルートの .env ファイルをバックエンド側から読み込める位置にマウント
+      - .env:/app/backend/.env
     environment:
       MYSQL_HOST: ${MYSQL_HOST}
       MYSQL_USER: ${MYSQL_USER}
@@ -39,18 +41,21 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "127.0.0.1:5174:5174"
+      - "5173:5173"
+    # コンテナ内での起動時のカレントディレクトリを /app/frontend に指定
+    working_dir: /app/frontend
     volumes:
-      # フロントエンドのコード変更を即時反映
-      - ./frontend:/app
-      # ホスト側の node_modules でコンテナ側が上書きされないように、コンテナ専用のボリュームを作る
-      - /app/node_modules
+      # プロジェクトルートディレクトリをマウント
+      - .:/app
+      # ホスト側の node_modules でコンテナ側が上書きされないように、
+      # コンテナ内のフロントエンドの node_modules ディレクトリを匿名ボリュームで保護
+      - /app/frontend/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true # Windows等でホットリロードが正しく動くようにする設定
       - VITE_GOOGLE_MAPS_API_KEY=${VITE_GOOGLE_MAPS_API_KEY}
     depends_on:
       - backend
-    stdin_open: true # Viteのインタラクティブシェル等を維持するための設定
+    stdin_open: true
     tty: true
 
 volumes:

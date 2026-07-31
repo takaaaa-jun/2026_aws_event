@@ -2,11 +2,10 @@
 FROM node:20-alpine
 
 # 作業ディレクトリの指定
-# frontendコンテナ内の /app は， /2026_aws_event/frontend に対応
-WORKDIR /app
+# frontendコンテナ内の /app/frontend は，ホストの ./frontend に対応
+WORKDIR /app/frontend
 
 # パッケージ定義ファイルをコンテナにコピー
-# package.json と package-lock.json (存在する場合) を先にコピーしてキャッシュを有効化
 COPY package*.json ./
 
 # 依存パッケージのインストール
@@ -19,5 +18,4 @@ COPY . .
 EXPOSE 5173
 
 # 開発用サーバーの起動コマンド
-# コンテナ起動時に「npm run dev」を実行し、ホスト（0.0.0.0）をバインドして外部からアクセス可能にする
 CMD ["npm", "run", "dev", "--", "--host"]
