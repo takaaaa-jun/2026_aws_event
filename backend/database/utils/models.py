@@ -76,22 +76,31 @@ class Municipality(Base):
     __tablename__ = "municipality"
 
     municipality_id = Column(Integer, primary_key=True, autoincrement=True)
-    prefecture_raw_id = Column(Integer, nullable=False)
+    prefecture_id = Column(Integer, ForeignKey("prefecture.prefecture_id"), nullable=False)
     municipality_raw_id = Column(Integer, nullable=False)
     municipality_name = Column(String(255), nullable=True)
 
 
-class Area(Base):
-    __tablename__ = "area"
+class City(Base):
+    __tablename__ = "city"
 
-    area_id = Column(Integer, primary_key=True, autoincrement=True)
-    prefecture_raw_id = Column(Integer, nullable=False)
-    municipality_raw_id = Column(Integer, nullable=False)
-    area_raw_id = Column(Integer, nullable=False)
-    area_name = Column(String(255), nullable=True)
+    city_id = Column(Integer, primary_key=True, autoincrement=True)
+    municipality_id = Column(Integer, ForeignKey("municipality.municipality_id"), nullable=False)
+    city_raw_id = Column(Integer, nullable=False)
+    city_name = Column(String(255), nullable=True)
+
+    areas = relationship("AreaCity", back_populates="city")
+
+
+class AreaCity(Base):
+    __tablename__ = "area_city"
+
+    area_city_id = Column(Integer, primary_key=True, autoincrement=True)
+    city_id = Column(Integer, ForeignKey("city.city_id"), nullable=False)
     latitude = Column(Double, nullable=True)
     longitude = Column(Double, nullable=True)
 
-    reference_id = Column(Integer, nullable=True)
-    area_group = Column(Integer, nullable=True)
+    city = relationship("City", back_populates="areas")
+
+
 

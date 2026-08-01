@@ -2,11 +2,12 @@ import os
 import sys
 import csv
 from pathlib import Path
+from collections import defaultdict
 
 utils_dir = Path(__file__).resolve().parent.parent / "utils"
 sys.path.append(str(utils_dir))
 
-from models import Prefecture, Municipality, Area
+from models import Prefecture, Municipality, City, AreaCity
 from path_info import get_doctorless_area_path
 from session import session
 
@@ -39,19 +40,31 @@ def verify_data():
     print("データベースからインポートされたデータを取得中...")
     prefectures = session.query(Prefecture).all()
     municipalities = session.query(Municipality).all()
-    areas = session.query(Area).all()
+    cities = session.query(City).all()
+    area_cities = session.query(AreaCity).all()
 
+    # マッピングの作成
     pref_map = {p.prefecture_raw_id: p for p in prefectures}
-    mun_map = {(m.prefecture_raw_id, m.municipality_raw_id): m for m in municipalities}
-    area_map = {(a.prefecture_raw_id, a.municipality_raw_id, a.area_raw_id): a for a in areas}
+    mun_map = {(m.prefecture_id, m.municipality_raw_id): m for m in municipalities}
+    city_map = {(c.municipality_id, c.city_raw_id): c for c in cities}
 
-    print(f"DB登録数 - 都道府県: {len(prefectures)}, 市区町村: {len(municipalities)}, 地区: {len(areas)}")
+    # 各city_idに紐づく座標リスト
+    coords_by_city = defaultdict(list)
+    for ac in area_cities:
+        coords_by_city[ac.city_id].append((ac.latitude, ac.longitude))
+
+    # 市区町村IDから都道府県IDを引くマップ
+    mun_pref_map = {m.municipality_id: m.prefecture_id for m in municipalities}
+    pref_id_to_raw = {p.prefecture_id: p.prefecture_raw_id for p in prefectures}
+
+    print(f"DB登録数 - 都道府県: {len(prefectures)}, 市区町村: {len(municipalities)}, 町: {len(cities)}, 座標点: {len(area_cities)}")
 
     total_rows = 0
     mismatches = 0
     missing_prefecture = 0
     missing_municipality = 0
-    missing_area = 0
+    missing_city = 0
+    missing_coord = 0
 
     print("元データ (CSV) との照合を開始します...")
     with open(ORIGINAL_CSV, mode="r", encoding="cp932") as f:
@@ -65,9 +78,10 @@ def verify_data():
 
             # IDのパース
             mun_raw_id = mun_code % 1000 if mun_code is not None else None
-            area_raw_id = int(area_code_str[5:]) if area_code_str and len(area_code_str) >= 12 else None
+            city_raw_id = (int(area_code_str[5:]) // 1000) if area_code_str and len(area_code_str) >= 12 else None
 
-            # 都道府県のチェック
+
+            # 1. 都道府県のチェック
             pref = pref_map.get(pref_raw_id)
             if not pref:
                 missing_prefecture += 1
@@ -79,8 +93,8 @@ def verify_data():
                 mismatches += 1
                 print(f"不一致 [都道府県名]: DB '{pref.prefecture_name}' vs CSV '{row.get('都道府県名')}'")
 
-            # 市区町村のチェック
-            mun = mun_map.get((pref_raw_id, mun_raw_id))
+            # 2. 市区町村のチェック
+            mun = mun_map.get((pref.prefecture_id, mun_raw_id))
             if not mun:
                 missing_municipality += 1
                 mismatches += 1
@@ -91,44 +105,45 @@ def verify_data():
                 mismatches += 1
                 print(f"不一致 [市区町村名]: DB '{mun.municipality_name}' vs CSV '{row.get('市区町村名')}'")
 
-            # 地区のチェック
-            area = area_map.get((pref_raw_id, mun_raw_id, area_raw_id))
-            if not area:
-                missing_area += 1
+            # 3. 町のチェック
+            city = city_map.get((mun.municipality_id, city_raw_id))
+            if not city:
+                missing_city += 1
                 mismatches += 1
-                print(f"不一致 [地区未登録]: 都道府県 {pref_raw_id}, 市区町村 {mun_raw_id}, 地区コード {area_raw_id}")
+                print(f"不一致 [町未登録]: 市区町村 {mun.municipality_name}, 町コード {city_raw_id}")
                 continue
 
-            # 詳細データのチェック
-            errors = []
-            if area.area_name != row.get("大字町丁目名"):
-                errors.append(f"地区名: DB '{area.area_name}' vs CSV '{row.get('大字町丁目名')}'")
+            # 地名の前方一致チェック
+            csv_area_name = row.get("大字町丁目名", "").strip()
+            db_city_name = city.city_name or ""
+            if not csv_area_name.startswith(db_city_name):
+                mismatches += 1
+                print(f"不一致 [町名 (前方一致不適合)]: DB '{db_city_name}' vs CSV '{csv_area_name}'")
 
+            # 4. 座標のチェック (誤差1e-7以内で一致する座標が同一city_id内に存在するか)
             csv_lat = get_float_value(row.get("緯度"))
             csv_lng = get_float_value(row.get("経度"))
-            if csv_lat is not None and (area.latitude is None or abs(area.latitude - csv_lat) > 1e-7):
-                errors.append(f"緯度: DB {area.latitude} vs CSV {csv_lat}")
-            if csv_lng is not None and (area.longitude is None or abs(area.longitude - csv_lng) > 1e-7):
-                errors.append(f"経度: DB {area.longitude} vs CSV {csv_lng}")
+            
+            coord_matched = False
+            if csv_lat is not None and csv_lng is not None:
+                for db_lat, db_lng in coords_by_city.get(city.city_id, []):
+                    if db_lat is not None and db_lng is not None:
+                        if abs(db_lat - csv_lat) < 1e-7 and abs(db_lng - csv_lng) < 1e-7:
+                            coord_matched = True
+                            break
 
-            csv_ref_id = get_int_value(row.get("原典資料コード"))
-            if area.reference_id != csv_ref_id:
-                errors.append(f"原典資料コード: DB {area.reference_id} vs CSV {csv_ref_id}")
-
-            csv_area_group = get_int_value(row.get("大字・字・丁目区分コード"))
-            if area.area_group != csv_area_group:
-                errors.append(f"区分コード: DB {area.area_group} vs CSV {csv_area_group}")
-
-            if errors:
+            if not coord_matched:
+                missing_coord += 1
                 mismatches += 1
-                print(f"データ不一致 [地区ID {area.area_id}]: {', '.join(errors)}")
+                print(f"不一致 [座標不一致 / 未登録]: 町 {db_city_name} (ID {city.city_id}), CSV座標 ({csv_lat}, {csv_lng})")
 
     print("\n--- 照合結果 ---")
     print(f"CSV総行数: {total_rows}")
     print(f"不一致レコード数: {mismatches}")
     print(f"未登録の都道府県: {missing_prefecture}")
     print(f"未登録の市区町村: {missing_municipality}")
-    print(f"未登録の地区: {missing_area}")
+    print(f"未登録の町: {missing_city}")
+    print(f"未登録・不一致の座標点: {missing_coord}")
 
     if mismatches == 0:
         print("検証成功")
