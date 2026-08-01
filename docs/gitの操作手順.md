@@ -1,6 +1,7 @@
-#Git操作手順書
+# Git操作手順書
 
 ## 初期設定
+
 ```bash
 # リポジトリの初期化
 git init
@@ -11,6 +12,7 @@ git remote add origin [remote-url]
 ```
 
 ## 通常の作業
+
 ```bash
 # ステージング
 git add .

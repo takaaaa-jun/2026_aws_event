@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, Float, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, Float, Boolean, ForeignKey, Double
 from sqlalchemy.orm import relationship
 
 try:
@@ -35,10 +35,11 @@ class LatitudeLongitude(Base):
 
     ll_id = Column(Integer, primary_key=True, autoincrement=True)
     clinic_id = Column(Integer, ForeignKey("clinic.clinic_id"), nullable=False)
-    latitude = Column(Float, nullable=True)
-    longitude = Column(Float, nullable=True)
+    latitude = Column(Double, nullable=True)
+    longitude = Column(Double, nullable=True)
 
     clinic = relationship("Clinic", back_populates="latitude_longitude")
+
 
 
 class Department(Base):
@@ -61,3 +62,36 @@ class ClinicDepartment(Base):
 
     clinic = relationship("Clinic", back_populates="departments")
     department = relationship("Department", back_populates="clinics")
+
+
+class Prefecture(Base):
+    __tablename__ = "prefecture"
+
+    prefecture_id = Column(Integer, primary_key=True, autoincrement=True)
+    prefecture_raw_id = Column(Integer, nullable=False)
+    prefecture_name = Column(String(255), nullable=True)
+
+
+class Municipality(Base):
+    __tablename__ = "municipality"
+
+    municipality_id = Column(Integer, primary_key=True, autoincrement=True)
+    prefecture_raw_id = Column(Integer, nullable=False)
+    municipality_raw_id = Column(Integer, nullable=False)
+    municipality_name = Column(String(255), nullable=True)
+
+
+class Area(Base):
+    __tablename__ = "area"
+
+    area_id = Column(Integer, primary_key=True, autoincrement=True)
+    prefecture_raw_id = Column(Integer, nullable=False)
+    municipality_raw_id = Column(Integer, nullable=False)
+    area_raw_id = Column(Integer, nullable=False)
+    area_name = Column(String(255), nullable=True)
+    latitude = Column(Double, nullable=True)
+    longitude = Column(Double, nullable=True)
+
+    reference_id = Column(Integer, nullable=True)
+    area_group = Column(Integer, nullable=True)
+
