@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, Float, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, Float, Boolean, ForeignKey, Double
 from sqlalchemy.orm import relationship
 
 try:
@@ -35,10 +35,11 @@ class LatitudeLongitude(Base):
 
     ll_id = Column(Integer, primary_key=True, autoincrement=True)
     clinic_id = Column(Integer, ForeignKey("clinic.clinic_id"), nullable=False)
-    latitude = Column(Float, nullable=True)
-    longitude = Column(Float, nullable=True)
+    latitude = Column(Double, nullable=True)
+    longitude = Column(Double, nullable=True)
 
     clinic = relationship("Clinic", back_populates="latitude_longitude")
+
 
 
 class Department(Base):
@@ -61,3 +62,45 @@ class ClinicDepartment(Base):
 
     clinic = relationship("Clinic", back_populates="departments")
     department = relationship("Department", back_populates="clinics")
+
+
+class Prefecture(Base):
+    __tablename__ = "prefecture"
+
+    prefecture_id = Column(Integer, primary_key=True, autoincrement=True)
+    prefecture_raw_id = Column(Integer, nullable=False)
+    prefecture_name = Column(String(255), nullable=True)
+
+
+class Municipality(Base):
+    __tablename__ = "municipality"
+
+    municipality_id = Column(Integer, primary_key=True, autoincrement=True)
+    prefecture_id = Column(Integer, ForeignKey("prefecture.prefecture_id"), nullable=False)
+    municipality_raw_id = Column(Integer, nullable=False)
+    municipality_name = Column(String(255), nullable=True)
+
+
+class City(Base):
+    __tablename__ = "city"
+
+    city_id = Column(Integer, primary_key=True, autoincrement=True)
+    municipality_id = Column(Integer, ForeignKey("municipality.municipality_id"), nullable=False)
+    city_raw_id = Column(Integer, nullable=False)
+    city_name = Column(String(255), nullable=True)
+
+    areas = relationship("AreaCity", back_populates="city")
+
+
+class AreaCity(Base):
+    __tablename__ = "area_city"
+
+    area_city_id = Column(Integer, primary_key=True, autoincrement=True)
+    city_id = Column(Integer, ForeignKey("city.city_id"), nullable=False)
+    latitude = Column(Double, nullable=True)
+    longitude = Column(Double, nullable=True)
+
+    city = relationship("City", back_populates="areas")
+
+
+

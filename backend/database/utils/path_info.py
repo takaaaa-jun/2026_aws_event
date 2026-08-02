@@ -12,6 +12,7 @@ else:
 
 SQL_DIR_PATH = ROOT_DIR_PATH / "data" / "sql"
 GEOCODING_DIR_PATH = ROOT_DIR_PATH / "data" / "geocoding"
+DOCTORLESS_AREA_DIR_PATH = ROOT_DIR_PATH / "data" / "doctorless_area"
 
 def get_env_path() -> Path:
     return ENV_FILE_PATH
@@ -21,3 +22,6 @@ def get_sql_path() -> Path:
 
 def get_geocoding_path() -> Path:
     return GEOCODING_DIR_PATH
+
+def get_doctorless_area_path() -> Path:
+    return DOCTORLESS_AREA_DIR_PATH
