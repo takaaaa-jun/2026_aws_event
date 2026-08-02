@@ -19,7 +19,7 @@ const NIIGATA_CENTER = {
 
 // APIキーの設定
 setOptions({
-  key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY, // 自身のAPIキーを設定
+  key: import.meta.env.VITE_GOOGLE_MAPS_API_KEY || "", // 自身のAPIキーを設定
   v: "weekly", //週単位で更新を読み込む設定
 });
 
@@ -148,8 +148,8 @@ function GoogleMap({ locations }: GoogleMapProps) {
       ref={mapElementRef}
       // マップ部分のCSS
       style={{
-        width: "50%",
-        height: "600px",
+        width: "100%", // MapArea内でレイアウトを制御しやすいように100%に変更
+        flex: 1, // 高さを固定せず、余白全体を自動で埋めるように変更
         border: "1px solid #ccc",
       }}
     />

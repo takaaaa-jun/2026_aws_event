@@ -1,0 +1,13 @@
+.header {
+  background-color: #1a6b3c;
+  color: #ffffff;
+  padding: 12px 32px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.header-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+  color: #ffffff;
+}

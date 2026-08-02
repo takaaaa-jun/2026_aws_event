@@ -1,6 +1,5 @@
 export type clinicMap = {
-    id: number;
-    name: string;
-    lat: number;
-    lng: number;
+  lat: number;
+  lng: number;
+  name: string;
 };

@@ -30,6 +30,9 @@ def connection_database():
     db_user = env_data.get("MYSQL_USER", "root")
     db_password = env_data.get("MYSQL_PASSWORD", "pass")
     db_port = env_data.get("MYSQL_PORT", "3306")
+    if os.path.exists('/.dockerenv'):
+        db_host = "db"
+        db_port = "3306"
     db_database = env_data.get("MYSQL_DATABASE", "clinic")
 
     DATABASE = f"mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_database}?charset=utf8mb4"

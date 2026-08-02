@@ -1,37 +1,45 @@
-import GoogleMap from "./components/GoogleMap";
-import type { clinicMap } from "./types/clinicMap";
-import "./App.css";
-
-// テスト用データ
-const clinicMaps: clinicMap[] = [
-  {
-    id: 1,
-    name: "本間医院",
-    lat: 38.223648,
-    lng: 139.475800,
-  },
-  {
-    id: 2,
-    name: "安斎医院",
-    lat: 38.192665,
-    lng: 139.437790,
-  },
-  {
-    id: 3,
-    name: "富樫眼科医院",
-    lat: 38.221596,
-    lng: 139.476959,
-  },
-];
+import { useState, useMemo } from 'react'
+import Header from './components/Header'
+import FilterPanel from './components/FilterPanel'
+import MapArea from './components/MapArea'
+import useClinicData from './hooks/useClinicData'
+import './App.css'
 
 function App() {
-  return (
-    <main className="app">
-      <p>マーカーをクリックして緯度経度情報を表示</p>
+  const [selectedDepartments, setSelectedDepartments] = useState<number[]>([])
 
-      <GoogleMap locations={clinicMaps} />
-    </main>
-  );
+  // APIを1回だけ呼んで departments と clinics を取得
+  // FilterPanel と MapArea に配布する
+  const { departments, clinics, loading, error } = useClinicData()
+
+  // 選択中の診療科で診療所を絞り込み → MapArea(田部君)に渡す
+  const filteredClinics = useMemo(() => {
+    if (selectedDepartments.length === 0) {
+      return clinics
+    }
+    return clinics.filter((clinic) =>
+      clinic.departments.some((dep) => selectedDepartments.includes(dep.department_id))
+    )
+  }, [clinics, selectedDepartments])
+
+  return (
+    <div className="app">
+      <Header />
+      <div className="app-body">
+        {/* 田部君はここで filteredClinics を使う */}
+        <MapArea clinics={filteredClinics} />
+
+        {/* フィルターパネル: departments は App から受け取る*/}
+        <FilterPanel
+          departments={departments}
+          loading={loading}
+          error={error}
+          selected={selectedDepartments}
+          onChange={setSelectedDepartments}
+        />
+      </div>
+    </div>
+  )
 }
 
-export default App;
+export default App
