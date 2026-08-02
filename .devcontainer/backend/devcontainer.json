@@ -1,0 +1,17 @@
+{
+    "name": "Backend Development (FastAPI)",
+    "dockerComposeFile": [
+        "../../docker-compose.yaml"
+    ],
+    "service": "backend",
+    "workspaceFolder": "/app",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance"
+            ]
+        }
+    },
+    "shutdownAction": "stopCompose"
+}

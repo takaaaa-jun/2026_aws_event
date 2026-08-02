@@ -1,0 +1,56 @@
+services:
+  # 1. データベース (MySQL)
+  db:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - "${MYSQL_PORT}:3306"
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      LANG: C.UTF-8
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # 2. バックエンド (Python / FastAPI)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      # ローカルのbackendディレクトリをコンテナ内にマウント
+      - ./backend:/app
+      # データベース接続に必要な設定を共有するため，ルートの .env ファイルをマウント
+      - .env:/app/.env
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PORT: ${MYSQL_PORT}
+    depends_on:
+      - db
+
+  # 3. フロントエンド (React + TypeScript / Vite)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      # フロントエンドのコード変更を即時反映
+      - ./frontend:/app
+      # ホスト側の node_modules でコンテナ側が上書きされないように、コンテナ専用のボリュームを作る
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true # Windows等でホットリロードが正しく動くようにする設定
+    depends_on:
+      - backend
+    stdin_open: true # Viteのインタラクティブシェル等を維持するための設定
+    tty: true
+
+volumes:
+  mysql_data:
