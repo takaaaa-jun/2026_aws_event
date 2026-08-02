@@ -3,14 +3,14 @@ import type { Department } from '../types/clinic'
 import './FilterPanel.css'
 
 interface FilterPanelProps {
-  departments: Department[]   // App.tsx から受け取る（API二重呼び出しなし）
+  departments: Department[]   // App.tsx から受け取る
   loading: boolean
   error: string | null
   selected: number[]
   onChange: (selected: number[]) => void
 }
 
-const COLUMN_SIZE = 22 // 左列に並べる件数（残りは右列）
+const COLUMN_SIZE = 22 // 左列に並べる件数
 
 function FilterPanel({ departments, loading, error, selected, onChange }: FilterPanelProps) {
   const [searchQuery, setSearchQuery] = useState('')
@@ -31,7 +31,7 @@ function FilterPanel({ departments, loading, error, selected, onChange }: Filter
     d.department_name.includes(searchQuery.trim())
   )
 
-  // 左列・右列に分割（検索中はそのまま並べる）
+  // 左列・右列に分割
   const isSearching = searchQuery.trim() !== ''
   const leftCol = isSearching ? filtered : filtered.slice(0, COLUMN_SIZE)
   const rightCol = isSearching ? [] : filtered.slice(COLUMN_SIZE)

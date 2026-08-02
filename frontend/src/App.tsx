@@ -9,10 +9,10 @@ function App() {
   const [selectedDepartments, setSelectedDepartments] = useState<number[]>([])
 
   // APIを1回だけ呼んで departments と clinics を取得
-  // → FilterPanel と MapArea に配布する
+  // FilterPanel と MapArea に配布する
   const { departments, clinics, loading, error } = useClinicData()
 
-  // 選択中の診療科で診療所を絞り込み → MapArea（Googleマップ担当）に渡す
+  // 選択中の診療科で診療所を絞り込み → MapArea(田部君)に渡す
   const filteredClinics = useMemo(() => {
     if (selectedDepartments.length === 0) {
       return clinics
@@ -26,10 +26,10 @@ function App() {
     <div className="app">
       <Header />
       <div className="app-body">
-        {/* Googleマップ担当の方はここで filteredClinics を使う */}
+        {/* 田部君はここで filteredClinics を使う */}
         <MapArea clinics={filteredClinics} />
 
-        {/* フィルターパネル: departments は App から受け取る（API二重呼び出しなし） */}
+        {/* フィルターパネル: departments は App から受け取る*/}
         <FilterPanel
           departments={departments}
           loading={loading}
