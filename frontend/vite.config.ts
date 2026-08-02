@@ -5,8 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 5174,
-    strictPort: true, // 5174が使用中の場合はエラーにする
+    port: 5173,
+    strictPort: true, // 5173が使用中の場合はエラーにする
     host: true,       // コンテナ外（Windows側）からアクセス可能にする
     proxy: {
       // /api から始まるリクエストをバックエンドコンテナに転送する

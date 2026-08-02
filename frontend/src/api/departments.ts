@@ -7,8 +7,8 @@ const API_BASE_URL = ''
 const MOCK_MODE = false
 
 // 正しいエンドポイント: /api/v1/clinics?limit=<件数>
-// limit は必須パラメータ。今回は2000を指定
-const CLINICS_ENDPOINT = `${API_BASE_URL}/api/v1/clinics?limit=2000`
+// limit は必須パラメータ。今回は3000を指定
+const CLINICS_ENDPOINT = `${API_BASE_URL}/api/v1/clinics?limit=3000`
 
 // 診療科一覧を取得する（APIレスポンスの departments フィールドを返す）
 export async function fetchDepartments(): Promise<Department[]> {

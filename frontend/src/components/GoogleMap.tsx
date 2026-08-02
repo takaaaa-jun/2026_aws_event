@@ -149,7 +149,7 @@ function GoogleMap({ locations }: GoogleMapProps) {
       // マップ部分のCSS
       style={{
         width: "100%", // MapArea内でレイアウトを制御しやすいように100%に変更
-        height: "600px",
+        flex: 1, // 高さを固定せず、余白全体を自動で埋めるように変更
         border: "1px solid #ccc",
       }}
     />
