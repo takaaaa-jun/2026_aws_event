@@ -15,7 +15,7 @@ function App() {
   // 選択中の診療科で診療所を絞り込み → MapArea(田部君)に渡す
   const filteredClinics = useMemo(() => {
     if (selectedDepartments.length === 0) {
-      return clinics
+      return []
     }
     return clinics.filter((clinic) =>
       clinic.departments.some((dep) => selectedDepartments.includes(dep.department_id))
