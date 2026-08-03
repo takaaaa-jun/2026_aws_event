@@ -99,6 +99,7 @@ class AreaCity(Base):
     city_id = Column(Integer, ForeignKey("city.city_id"), nullable=False, index=True)
     latitude = Column(Double, nullable=True)
     longitude = Column(Double, nullable=True)
+    doctorless_flag = Column(Boolean, nullable=True)
 
     city = relationship("City", back_populates="areas")
 
