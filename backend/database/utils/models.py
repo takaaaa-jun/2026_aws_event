@@ -104,4 +104,20 @@ class AreaCity(Base):
     city = relationship("City", back_populates="areas")
 
 
+class DoctorlessCity(Base):
+    __tablename__ = "doctorless_city"
+
+    # city_id の値が入るが、cityテーブルへのForeignKey制約は持たせない
+    # 手動でIDを挿入するため、autoincrement=False を設定する
+    doctorless_city_id = Column(Integer, primary_key=True, index=True, autoincrement=False)
+    municipality_id = Column(Integer, ForeignKey("municipality.municipality_id"), nullable=False, index=True)
+    city_raw_id = Column(Integer, nullable=False, index=True)
+    city_name = Column(String(255), nullable=True, index=True)
+    latitude = Column(Double, nullable=True)
+    longitude = Column(Double, nullable=True)
+    doctorless_flag = Column(Boolean, nullable=True)
+
+    municipality = relationship("Municipality")
+
+
 
