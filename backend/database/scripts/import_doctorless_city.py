@@ -7,10 +7,12 @@ utils_dir = Path(__file__).resolve().parent.parent / "utils"
 sys.path.append(str(utils_dir))
 
 from connection_database import connection_database
-from models import DoctorlessCity
+from models import DoctorlessCity, City
 from path_info import get_doctorless_area_path
 from log_decorator import Logger
 from session import session
+from sqlalchemy import select
+from sqlalchemy.orm import Session, selectinload
 
 DOCTORLESS_CITY_CSV = get_doctorless_area_path() / "doctorless_city.csv"
 
@@ -52,11 +54,19 @@ def import_csv_data():
 
     if DOCTORLESS_CITY_CSV.exists():
         print(f"無医地区（市区町村）データのインポートを開始: {DOCTORLESS_CITY_CSV.name}")
+        
+        
+        
         with open(DOCTORLESS_CITY_CSV, mode="r", encoding="utf-8-sig") as f:
             reader = csv.DictReader(f)
             for row in reader:
+                statement = (
+                        select(City.city_id)
+                        .where(City.city_raw_id == get_int_value(row.get("city_raw_id")) , City.city_name == row.get("city_name"))
+                    )
+                city_id = session.scalars(statement).first()
                 doctorless_city = DoctorlessCity(
-                    doctorless_city_id=get_int_value(row.get("city_id")),
+                    doctorless_city_id=city_id,
                     municipality_id=get_int_value(row.get("municipality_id")),
                     city_raw_id=get_int_value(row.get("city_raw_id")),
                     city_name=row.get("city_name"),
