@@ -120,4 +120,19 @@ class DoctorlessCity(Base):
     municipality = relationship("Municipality")
 
 
+class DoctorlessCityInternal(Base):
+    __tablename__ = "doctorless_city_internal"
+
+    # doctorless_city と全く同じ構造
+    doctorless_city_id = Column(Integer, primary_key=True, index=True, autoincrement=False)
+    municipality_id = Column(Integer, ForeignKey("municipality.municipality_id"), nullable=False, index=True)
+    city_raw_id = Column(Integer, nullable=False, index=True)
+    city_name = Column(String(255), nullable=True, index=True)
+    latitude = Column(Double, nullable=True)
+    longitude = Column(Double, nullable=True)
+    doctorless_flag = Column(Boolean, nullable=True)
+
+    municipality = relationship("Municipality")
+
+
 
