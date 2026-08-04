@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.clinics import router as clinics_router
+from app.api.doctorless_area import router as doctorless_area_router
 
 app = FastAPI(title="AWS Event Clinic API")
 
@@ -24,3 +25,4 @@ def health_check():
 
 
 app.include_router(clinics_router)
+app.include_router(doctorless_area_router)
