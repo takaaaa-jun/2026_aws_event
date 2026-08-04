@@ -8,11 +8,21 @@ interface FilterPanelProps {
   error: string | null
   selected: number[]
   onChange: (selected: number[]) => void
+  showDoctorlessArea: boolean
+  onToggleDoctorlessArea: (checked: boolean) => void
 }
 
 const COLUMN_SIZE = 22 // 左列に並べる件数
 
-function FilterPanel({ departments, loading, error, selected, onChange }: FilterPanelProps) {
+function FilterPanel({
+  departments,
+  loading,
+  error,
+  selected,
+  onChange,
+  showDoctorlessArea,
+  onToggleDoctorlessArea
+}: FilterPanelProps) {
   const [searchQuery, setSearchQuery] = useState('')
 
   const toggle = (id: number) => {
@@ -38,6 +48,22 @@ function FilterPanel({ departments, loading, error, selected, onChange }: Filter
 
   return (
     <aside className="filter-panel">
+      <h2 className="filter-title">マップ表示設定</h2>
+
+      <div className="filter-setting-group">
+        <label className="filter-label" style={{ fontWeight: 'bold', color: '#d32f2f' }}>
+          <input
+            type="checkbox"
+            className="filter-checkbox"
+            checked={showDoctorlessArea}
+            onChange={(e) => onToggleDoctorlessArea(e.target.checked)}
+          />
+          無医地区を表示する
+        </label>
+      </div>
+
+      <hr style={{ margin: '16px 0', border: 'none', borderTop: '1px solid #ccc' }} />
+
       <h2 className="filter-title">診療科で絞り込む</h2>
 
       {/* 検索ボックス */}
