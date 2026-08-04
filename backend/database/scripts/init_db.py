@@ -7,7 +7,7 @@ sys.path.append(str(utils_dir))
 
 from connection_database import connection_database
 # models から Base をインポートすることで、テーブルのメタデータが登録された Base を使用できます
-from models import Base, Clinic, LatitudeLongitude, Department, ClinicDepartment, Prefecture, Municipality, City, AreaCity, DoctorlessCity
+from models import Base, Clinic, LatitudeLongitude, Department, ClinicDepartment, Prefecture, Municipality, City, AreaCity, DoctorlessCity, DoctorlessCityInternal
 from session import engine
 
 
