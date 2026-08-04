@@ -5,10 +5,12 @@ import {
 } from "@googlemaps/js-api-loader";
 
 import type { clinicMap } from "../types/clinicMap";
+import type { DoctorlessArea } from "../types/doctorlessArea";
 
 // コンポーネントが受けとるデータ型の定義
 type GoogleMapProps = {
   locations: clinicMap[];
+  doctorlessAreas?: DoctorlessArea[];
 };
 
 // マップの中心座標
@@ -24,7 +26,7 @@ setOptions({
 });
 
 // GoogleMapの表示
-function GoogleMap({ locations }: GoogleMapProps) {
+function GoogleMap({ locations, doctorlessAreas = [] }: GoogleMapProps) {
   // GoogleMapの地図表示部分(HTML)を保存
   const mapElementRef = useRef<HTMLDivElement | null>(null);
 
@@ -36,6 +38,9 @@ function GoogleMap({ locations }: GoogleMapProps) {
     google.maps.marker.AdvancedMarkerElement[]
   >([]);
 
+  // 円(Circle)を保存
+  const circlesRef = useRef<google.maps.Circle[]>([]);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -46,11 +51,16 @@ function GoogleMap({ locations }: GoogleMapProps) {
       }
 
       // 使用ライブラリの読み込み
-      const [{ Map }, { AdvancedMarkerElement }] =
+      const [mapsLib, markerLib] =
         await Promise.all([
           importLibrary("maps") as Promise<google.maps.MapsLibrary>,
           importLibrary("marker") as Promise<google.maps.MarkerLibrary>,
         ]);
+      
+      const Map = mapsLib.Map;
+      const AdvancedMarkerElement = markerLib.AdvancedMarkerElement;
+      // Circleクラスを明示的に取得（新しいGoogle Maps APIのお作法に対応するため）
+      const Circle = (mapsLib as any).Circle || google.maps.Circle;
 
       if (cancelled || !mapElementRef.current) {
         return;
@@ -76,8 +86,13 @@ function GoogleMap({ locations }: GoogleMapProps) {
       markersRef.current.forEach((marker) => {
         marker.map = null;
       });
-
       markersRef.current = [];
+
+      // 古い円を削除
+      circlesRef.current.forEach((circle) => {
+        circle.setMap(null);
+      });
+      circlesRef.current = [];
 
       // 情報ウィンドウを定義
       const infoWindow = new google.maps.InfoWindow();
@@ -122,6 +137,33 @@ function GoogleMap({ locations }: GoogleMapProps) {
       });
 
       markersRef.current = newMarkers;
+
+      // 無医地区の円(Circle)を作成
+      // locationデータが存在し、正しい緯度経度を持つものだけを抽出（エラー回避）
+      const validAreas = doctorlessAreas.filter(
+        (area) =>
+          area.location &&
+          Number.isFinite(area.location.latitude) &&
+          Number.isFinite(area.location.longitude)
+      );
+
+      console.log("描画対象の無医地区データ（有効なもの）:", validAreas);
+
+      const newCircles = validAreas.map((area) => {
+        const circle = new Circle({
+          strokeColor: "#FF0000", // 赤色
+          strokeOpacity: 0.8,
+          strokeWeight: 2,
+          fillColor: "#FF0000",
+          fillOpacity: 0.35,
+          map,
+          center: { lat: area.location.latitude, lng: area.location.longitude },
+          radius: 4000, // 4km (メートル指定)
+        });
+        return circle;
+      });
+      
+      circlesRef.current = newCircles;
     };
 
     void initializeMapAndMarkers().catch((error: unknown) => {
@@ -137,10 +179,14 @@ function GoogleMap({ locations }: GoogleMapProps) {
       markersRef.current.forEach((marker) => {
         marker.map = null;
       });
-
       markersRef.current = [];
+
+      circlesRef.current.forEach((circle) => {
+        circle.setMap(null);
+      });
+      circlesRef.current = [];
     };
-  }, [locations]);
+  }, [locations, doctorlessAreas]);
 
   // マップ部分のHTML
   return (
